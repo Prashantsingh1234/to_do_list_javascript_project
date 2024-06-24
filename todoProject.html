@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Simple DOM Todo App</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background: linear-gradient(135deg, #f0f4fd, #c2e9fb);
+        font-family: 'Urbanist', sans-serif;
+        margin: 0;
+      }
+
+      h1 {
+        font-size: 2.5rem;
+        color: #333;
+        margin-bottom: 20px;
+      }
+
+      #inputField {
+        padding: 10px;
+        width: 300px;
+        border: 2px solid #ccc;
+        border-radius: 5px;
+        margin-bottom: 10px;
+        font-size: 1rem;
+      }
+
+      .btn {
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      .btn:hover {
+        background-color: #45a049;
+      }
+
+      .todoListsElem {
+        margin-top: 20px;
+        width: 300px;
+        max-height: 300px;
+        overflow-y: auto;
+        padding: 10px;
+        border: 2px solid #ccc;
+        border-radius: 5px;
+        background-color: #fff;
+      }
+
+      .todoItem {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        margin: 5px 0;
+      }
+
+      .deleteBtn {
+        padding: 5px 10px;
+        background-color: #e74c3c;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      .deleteBtn:hover {
+        background-color: #c0392b;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <h1>Simple DOM Todo App</h1>
+      <input type="text" id="inputField" placeholder="Enter a new task..." />
+      <button class="btn">Add Todo</button>
+      <div class="todoListsElem"></div>
+    </div>
+    <script>
+      let inputElem = document.getElementById("inputField");
+      let clickBtn = document.querySelector(".btn");
+      let todoElem = document.querySelector(".todoListsElem");
+
+      const getTodosFromLocalStorage = () => {
+        return JSON.parse(localStorage.getItem('todos')) || [];
+      };
+
+      const loadTodos = () => {
+        const todos = getTodosFromLocalStorage();
+        todos.forEach(todo => {
+          createTodoElement(todo);
+        });
+      };
+
+      const saveTodo = (todo) => {
+        const todos = getTodosFromLocalStorage();
+        todos.push(todo);
+        localStorage.setItem('todos', JSON.stringify(todos));
+      };
+
+      const removeTodo = (todo) => {
+        let todos = getTodosFromLocalStorage();
+        todos = todos.filter(item => item !== todo);
+        localStorage.setItem('todos', JSON.stringify(todos));
+      };
+
+      const createTodoElement = (text) => {
+        let todoItem = document.createElement("div");
+        todoItem.className = "todoItem";
+
+        let pElem = document.createElement("p");
+        pElem.textContent = text;
+
+        let deleteBtn = document.createElement("button");
+        deleteBtn.className = "deleteBtn";
+        deleteBtn.textContent = "Delete";
+        deleteBtn.addEventListener("click", () => {
+          removeTodo(text);
+          todoItem.remove();
+        });
+
+        todoItem.appendChild(pElem);
+        todoItem.appendChild(deleteBtn);
+        todoElem.appendChild(todoItem);
+      };
+
+      const addTodo = () => {
+        const newTodo = inputElem.value.trim();
+        if (newTodo === "") {
+          return;
+        }
+        const todos = getTodosFromLocalStorage();
+        if (todos.includes(newTodo)) {
+          alert("This todo item already exists!");
+          inputElem.value = "";
+          return;
+        }
+        createTodoElement(newTodo);
+        saveTodo(newTodo);
+        inputElem.value = "";
+      };
+
+      clickBtn.addEventListener("click", () => {
+        addTodo();
+      });
+
+      
+      window.onload = loadTodos;
+    </script>
+  </body>
+</html>
